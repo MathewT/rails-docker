@@ -1,4 +1,4 @@
-# rails-dev
+# rails-docker
 
 ## Build
 
