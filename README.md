@@ -15,3 +15,7 @@ docker run --rm -ti -v $HOME/.aws:/root/.aws -v $HOME/.ssh:/root/.ssh  -v "$(pwd
 ```bash
 rails new myexample-api --api -T --database=postgresql
 ```
+
+```bash
+rails new myexample-app -T --database=postgresql
+```
