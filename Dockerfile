@@ -1,12 +1,11 @@
-FROM smathewthomas/ruby:3.0.2-alpine3.14
+FROM smathewthomas/ruby:3.1.2-alpine3.16
 
-ENV PORT 3000
+COPY . .
 
-EXPOSE $PORT
+RUN gem install bundler
 
-RUN gem install rails bundler 
+RUN bundle install
 
-RUN gem install rails
+RUN bundle binstubs --all
 
-CMD ["/bin/sh"]
-
+CMD [ "/bin/bash" ]

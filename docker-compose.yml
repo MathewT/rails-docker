@@ -1,0 +1,66 @@
+version: '3.5'
+
+services:
+  redis:
+    image: redis:latest
+  localstack:
+    image: localstack/localstack
+    environment:
+      SERVICES: 'sqs'
+      DATA_DIR: '/localstack'
+      HOSTNAME: localstack
+      HOSTNAME_EXTERNAL: localstack
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack:/localstack
+  web:
+    container_name: my-rails-postgres-api-container
+    build: .
+    command: "bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    environment:
+      PGHOST: db
+      PGDATABASE: mydb
+      PGUSER: my_user
+      PGPASSWORD: my_password
+    depends_on:
+      - db
+      - redis
+  db:
+    container_name: postgres14.3_container
+    image: postgres:14.3-alpine3.16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: "postgres -c 'max_connections=500'"
+    environment:
+      PGHOST: db
+      PGDATABASE: mydb
+      PGUSER: my_user
+      PGPASSWORD: my_password
+    ports:
+      - "5432:5432"
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:5050"
+    volumes:
+       - pgadmin:/pgadmin
+    depends_on:
+      - db
+    restart: unless-stopped
+networks:
+  default:
+    name: node_postgres_default
+volumes:
+    postgres_data: {}
+    localstack: {}
+    pgadmin: {}
